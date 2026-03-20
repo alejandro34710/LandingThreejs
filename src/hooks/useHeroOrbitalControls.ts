@@ -111,7 +111,6 @@ function useHeroOrbitalControls({ isStoryActiveRef }: UseHeroOrbitalControlsArgs
 
   const transitionTo = useCallback(
     (nextIndexRaw: number) => {
-      if (isStoryActiveRef?.current) return;
       const nextIndex = wrapIndex(nextIndexRaw);
       const prevIndex = activeIndexRef.current;
       if (nextIndex === prevIndex) return;
@@ -176,7 +175,6 @@ function useHeroOrbitalControls({ isStoryActiveRef }: UseHeroOrbitalControlsArgs
   const bindHeroParallax = useMemo(() => {
     const onPointerMove = (e: PointerEvent<HTMLElement>) => {
       if (isReducedMotion) return;
-      if (isStoryActiveRef?.current) return;
       // Durante drag no movemos el parallax del texto.
       if (isDraggingRef.current) return;
       const el = e.currentTarget;
@@ -193,7 +191,6 @@ function useHeroOrbitalControls({ isStoryActiveRef }: UseHeroOrbitalControlsArgs
     };
 
     const onPointerLeave = () => {
-      if (isStoryActiveRef?.current) return;
       parallaxRef.current.x = 0;
       parallaxRef.current.y = 0;
     };
@@ -207,7 +204,6 @@ function useHeroOrbitalControls({ isStoryActiveRef }: UseHeroOrbitalControlsArgs
 
     const onPointerDown = (e: PointerEvent<HTMLElement>) => {
       // Evitamos “drag” al tocar botones.
-      if (isStoryActiveRef?.current) return;
       const target = e.target as HTMLElement | null;
       if (target?.closest?.("button")) return;
 
@@ -227,7 +223,6 @@ function useHeroOrbitalControls({ isStoryActiveRef }: UseHeroOrbitalControlsArgs
 
     const onPointerMove = (e: PointerEvent<HTMLElement>) => {
       if (!isDraggingRef.current) {
-        if (isStoryActiveRef?.current) return;
         // aun si no hay drag, actualizamos parallax con pointer move del showcase (sensación premium)
         if (!isReducedMotion) {
           const el = e.currentTarget;

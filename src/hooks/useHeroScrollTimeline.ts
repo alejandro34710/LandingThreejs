@@ -169,37 +169,9 @@ function useHeroScrollTimeline({
       };
 
       const recalcHandoffTargets = () => {
-        if (!manifestContent) {
-          handoffTargets = { sphereDx: 0, sphereDy: 0, manifestDx: 0, sphereScale: 1 };
-          return;
-        }
-        const sphereRect = showcaseFrame.getBoundingClientRect();
-        const manifestRect = manifestContent.getBoundingClientRect();
-
-        if (!sphereRect.width || !manifestRect.width) return;
-
-        const gapPx = isMobile ? 16 : 28;
-        const sphereW = sphereRect.width;
-        const sphereH = sphereRect.height;
-
-        // Empuja el texto lo suficiente para que el bloque del canvas quede a la izquierda sin solaparse.
-        const manifestDx = sphereW * (isMobile ? 0.42 : 0.45);
-        const finalManifestLeft = manifestRect.left + manifestDx;
-
-        const targetSphereRight = finalManifestLeft - gapPx;
-        const targetSphereLeft = targetSphereRight - sphereW;
-
-        // Centrado vertical con escala aplicada.
-        const sphereScale = isMobile ? 0.88 : 0.86;
-        const manifestCenterY = manifestRect.top + manifestRect.height / 2;
-        const targetTop = manifestCenterY - (sphereH * sphereScale) / 2;
-
-        handoffTargets = {
-          sphereDx: targetSphereLeft - sphereRect.left,
-          sphereDy: targetTop - sphereRect.top,
-          manifestDx,
-          sphereScale,
-        };
+        // Objetivo: esfera estática durante el scroll.
+        // Mantenemos el “handoff” en cero para que `showcaseFrame` (canvas) no se desplace.
+        handoffTargets = { sphereDx: 0, sphereDy: 0, manifestDx: 0, sphereScale: 1 };
       };
 
       recalcHandoffTargets();
@@ -237,15 +209,15 @@ function useHeroScrollTimeline({
       tl.to(
         orbitStoryRef.current,
         {
-          energy: 0.14,
-          offsetX: -0.02,
-          offsetY: -0.004,
-          offsetZ: 0.006,
+          energy: 0.12,
+          offsetX: 0,
+          offsetY: 0,
+          offsetZ: 0,
           scaleMul: 1.0,
-          rotAddX: 0.004,
-          rotAddY: 0.008,
+          rotAddX: 0,
+          rotAddY: 0,
           rotAddZ: 0,
-          motionMul: 0.88,
+          motionMul: 0.85,
           duration: 0.25,
         },
         0
@@ -320,14 +292,14 @@ function useHeroScrollTimeline({
         orbitStoryRef.current,
         {
           energy: 0.12,
-          offsetX: -0.02,
-          offsetY: -0.01,
-          offsetZ: -0.01,
-          scaleMul: isMobile ? 0.995 : 0.985,
-          rotAddX: 0.004,
-          rotAddY: 0.02,
-          rotAddZ: -0.002,
-          motionMul: 0.86,
+          offsetX: 0,
+          offsetY: 0,
+          offsetZ: 0,
+          scaleMul: 1.0,
+          rotAddX: 0,
+          rotAddY: 0,
+          rotAddZ: 0,
+          motionMul: 0.85,
           duration: 0.3,
         },
         0.25
@@ -383,15 +355,15 @@ function useHeroScrollTimeline({
       tl.to(
         orbitStoryRef.current,
         {
-          energy: 0.08,
-          offsetX: -0.04,
-          offsetY: -0.01,
-          offsetZ: -0.02,
-          scaleMul: isMobile ? 0.97 : 0.96,
-          rotAddX: 0.002,
-          rotAddY: 0.012,
-          rotAddZ: 0.004,
-          motionMul: isMobile ? 0.82 : 0.8,
+          energy: 0.12,
+          offsetX: 0,
+          offsetY: 0,
+          offsetZ: 0,
+          scaleMul: 1.0,
+          rotAddX: 0,
+          rotAddY: 0,
+          rotAddZ: 0,
+          motionMul: 0.85,
           duration: 0.25,
         },
         0.55
@@ -438,15 +410,15 @@ function useHeroScrollTimeline({
       tl.to(
         orbitStoryRef.current,
         {
-          energy: 0.05,
-          offsetX: -0.02,
-          offsetY: -0.015,
-          offsetZ: -0.03,
-          scaleMul: isMobile ? 0.975 : 0.95,
-          rotAddX: -0.01,
-          rotAddY: 0.02,
-          rotAddZ: 0.006,
-          motionMul: 0.8,
+          energy: 0.12,
+          offsetX: 0,
+          offsetY: 0,
+          offsetZ: 0,
+          scaleMul: 1.0,
+          rotAddX: 0,
+          rotAddY: 0,
+          rotAddZ: 0,
+          motionMul: 0.85,
           duration: 0.2,
         },
         0.8

@@ -2,9 +2,9 @@ function Navbar() {
   const navItems = ['Platform', 'Features', 'Solutions', 'Pricing'];
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 mt-4 px-4 md:mt-6 md:px-8">
+    <header className="fixed inset-x-0 top-0 z-50">
       {/* Contenedor tipo píldora flotante */}
-      <nav className="mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/10 bg-[#02040A]/50 px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-2xl md:px-8">
+      <nav className="w-full flex items-center justify-between border border-white/10 bg-[#02040A]/50 px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-2xl md:px-8">
         
         {/* Logo a la izquierda */}
         <a href="#hero" className="group flex items-center gap-3">
@@ -36,7 +36,7 @@ function Navbar() {
           >
             <span className="relative z-10">Get Started</span>
             {/* Efecto de brillo de luz que atraviesa el botón en hover */}
-            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-500 group-hover:translate-x-full" />
+            <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/10 to-transparent transition-transform duration-500 group-hover:translate-x-full" />
           </a>
         </div>
         

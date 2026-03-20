@@ -1,11 +1,9 @@
-import { Environment } from "@react-three/drei";
-
 function SceneLights() {
   return (
     <>
-      <Environment preset="city" environmentIntensity={0.38} />
-
-      <ambientLight intensity={0.05} color="#dbe7ff" />
+      {/* Luz base uniforme para evitar contraste fuerte arriba/abajo */}
+      <ambientLight intensity={0.18} color="#dbe7ff" />
+      <hemisphereLight intensity={0.22} color="#7dd3fc" groundColor="#4da6ff" />
 
       <directionalLight
         position={[5, 6, 4]}

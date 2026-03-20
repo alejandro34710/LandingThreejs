@@ -222,36 +222,58 @@ function HeroSection() {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-screen overflow-visible bg-[#02040A]"
-      onPointerMove={isStoryActive ? undefined : bindHeroParallax.onPointerMove}
-      onPointerLeave={isStoryActive ? undefined : bindHeroParallax.onPointerLeave}
+      // Igualamos el color base al resto de la web
+      className="relative min-h-screen overflow-visible bg-[#030014]"
+      onPointerMove={bindHeroParallax.onPointerMove}
+      onPointerLeave={bindHeroParallax.onPointerLeave}
     >
-      {/* --- FONDOS Y EFECTOS --- */}
-      <div className="pointer-events-none absolute inset-0">
-        {/* Grid futurista con opacidad ajustada */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-size-[32px_32px]" />
-
-        {/* Luces de Neón (Glows) Cinematográficas */}
+      {/* --- FONDOS Y EFECTOS: Z-0 PARA GARANTIZAR VISIBILIDAD --- */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        
+        {/* 1. Luces de Neón Cinematográficas (Mayor opacidad, quitamos mix-blend) */}
         <div
           ref={bgGlowLeftRef}
-          className="absolute left-[-15%] top-[-10%] h-[700px] w-[700px] rounded-full bg-purple-600/25 blur-[140px] mix-blend-screen"
+          className="absolute left-[-15%] top-[-10%] h-[800px] w-[800px] rounded-full bg-purple-600/30 blur-[150px]"
         />
         <div
           ref={bgGlowRightRef}
-          className="absolute right-[-5%] top-[15%] h-[600px] w-[600px] rounded-full bg-cyan-500/20 blur-[140px] mix-blend-screen"
+          className="absolute right-[-5%] top-[10%] h-[700px] w-[700px] rounded-full bg-cyan-500/30 blur-[150px]"
         />
         <div
           ref={bgGlowBottomRef}
-          className="absolute bottom-[-25%] left-[15%] h-[900px] w-[900px] rounded-full bg-blue-700/15 blur-[160px] mix-blend-screen"
+          className="absolute bottom-[-20%] left-[15%] h-[900px] w-[900px] rounded-full bg-blue-700/25 blur-[160px]"
         />
 
-        {/* Viñeta para centrar la atención en el contenido */}
+        {/* 2. Grid Infalible (Igual que en las otras secciones, pero un poco más amplio) */}
+        <div 
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
+            backgroundSize: '64px 64px',
+            maskImage: `radial-gradient(ellipse 100% 100% at 50% 50%, black 40%, transparent 100%)`,
+            WebkitMaskImage: `radial-gradient(ellipse 100% 100% at 50% 50%, black 40%, transparent 100%)`
+          }}
+        />
+
+        {/* 3. Partículas / Nodos de datos flotantes */}
+        <div className="absolute inset-0">
+          <div className="absolute top-[15%] left-[10%] h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_20px_4px_rgba(34,211,238,1)] animate-pulse" />
+          <div className="absolute top-[80%] left-[15%] h-3 w-3 rounded-full bg-purple-500 shadow-[0_0_20px_4px_rgba(168,85,247,1)]" />
+          <div className="absolute top-[25%] right-[45%] h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_10px_2px_rgba(96,165,250,1)]" />
+          <div className="absolute bottom-[25%] right-[5%] h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_15px_3px_rgba(103,232,249,1)] animate-pulse" />
+        </div>
+
+        {/* 4. Viñeta Suavizada (Ya no oculta todo, solo oscurece los bordes elegantemente) */}
         <div
           ref={heroVignetteRef}
-          className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#02040A_100%)] opacity-90"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at center, transparent 30%, #030014 120%)`
+          }}
         />
       </div>
 
+      {/* CONTENIDO PRINCIPAL: Z-10 */}
       <div className="relative z-10 mx-auto grid min-h-screen max-w-[1440px] grid-cols-1 items-center gap-12 px-6 pb-16 pt-28 md:px-10 md:pt-32 xl:grid-cols-[1fr_1fr] xl:px-16">
         
         {/* --- LADO IZQUIERDO (TEXTO) --- */}
@@ -293,7 +315,7 @@ function HeroSection() {
           {/* Subtítulo */}
           <p
             ref={subtitleRef}
-            className="mt-8 max-w-[500px] text-lg leading-relaxed text-gray-400 drop-shadow-md md:text-xl"
+            className="mt-8 max-w-[500px] text-lg leading-relaxed text-gray-300 drop-shadow-md md:text-xl font-light"
           >
             <span ref={subtitleParallaxRef} className="inline-block will-change-transform">
               {activePreset.subtitle}
@@ -303,7 +325,7 @@ function HeroSection() {
           {/* Botones de Acción */}
           <div ref={ctaRef} className="mt-12 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
             {/* CTA Primario */}
-            <button className="group relative flex h-14 items-center justify-center overflow-hidden rounded-full border border-purple-500/40 bg-[#02040A]/60 px-8 font-bold text-white shadow-[0_0_30px_rgba(168,85,247,0.2)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-400 hover:bg-purple-600/20 hover:shadow-[0_0_40px_rgba(168,85,247,0.5)] focus:outline-none">
+            <button className="group relative flex h-14 items-center justify-center overflow-hidden rounded-full border border-purple-500/40 bg-white/5 px-8 font-bold text-white shadow-[0_0_30px_rgba(168,85,247,0.2)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-400 hover:bg-purple-600/20 hover:shadow-[0_0_40px_rgba(168,85,247,0.5)] focus:outline-none">
               <span className="relative z-10 flex items-center gap-3 text-xs uppercase tracking-widest">
                 Explore The Core
                 <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -335,7 +357,7 @@ function HeroSection() {
           isDraggingRef={isDraggingRef}
           parallaxRef={parallaxRef}
           orbitStoryRef={orbitStoryRef}
-          isInteractionLocked={isStoryActive}
+          isInteractionLocked={false}
           goPrev={goPrev}
           goNext={goNext}
           bindShowcaseDrag={bindShowcaseDrag}

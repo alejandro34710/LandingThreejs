@@ -37,6 +37,10 @@ function OrbitRig({
   const fromGroupRef = useRef<Group | null>(null);
   const toGroupRef = useRef<Group | null>(null);
 
+  // Reducir draw calls: cuando el preset "from" está casi totalmente cruzado,
+  // lo ocultamos para evitar que se rendericen materiales caros (transmission/normal).
+  const visibilityEps = 0.01;
+
   const cameraLookAtRef = useRef(new Vector3(0, 0, 0));
   const parallaxCurrent = useRef({ x: 0, y: 0 });
 
@@ -61,6 +65,9 @@ function OrbitRig({
     const mix = mixRef.current.value;
     const wTo = Math.max(0, Math.min(1, mix));
     const wFrom = 1 - wTo;
+
+    if (fromGroupRef.current) fromGroupRef.current.visible = wFrom > visibilityEps;
+    if (toGroupRef.current) toGroupRef.current.visible = wTo > visibilityEps;
 
     // Crossfade scaling (tiny “expensive” feel)
     if (fromGroupRef.current) fromGroupRef.current.scale.setScalar(0.98 + wFrom * 0.02);
@@ -167,7 +174,7 @@ function OrbitScene({
     <Canvas
       className={className}
       camera={{ position: [0, 0, 10.4], fov: 34 }}
-      dpr={[1, 1.5]}
+      dpr={[1, 1.25]}
       gl={{ antialias: true, alpha: true }}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);
