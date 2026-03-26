@@ -12,6 +12,7 @@ type RotationOffset = { x: number; y: number };
 
 type OrbitSceneProps = {
   className?: string;
+  isMobile?: boolean;
   fromPreset: OrbitVariant;
   toPreset: OrbitVariant;
   mixRef: MutableRefObject<{ value: number }>;
@@ -24,6 +25,7 @@ type OrbitSceneProps = {
 };
 
 function OrbitRig({
+  isMobile = false,
   fromPreset,
   toPreset,
   mixRef,
@@ -44,10 +46,12 @@ function OrbitRig({
   const cameraLookAtRef = useRef(new Vector3(0, 0, 0));
   const parallaxCurrent = useRef({ x: 0, y: 0 });
 
-  const basePos = useMemo(() => new Vector3(0.38, -0.04, 0), []);
-  const baseRigScale = 1.08;
-
-  const baseCameraZ = 10.4;
+  const basePos = useMemo(
+    () => (isMobile ? new Vector3(0, -0.02, 0) : new Vector3(0.38, -0.04, 0)),
+    [isMobile],
+  );
+  const baseRigScale = isMobile ? 1.5 : 1.08;
+  const baseCameraZ = isMobile ? 8.5 : 10.4;
 
   const fromPresetRef = useRef(fromPreset);
   const toPresetRef = useRef(toPreset);
@@ -141,7 +145,7 @@ function OrbitRig({
   });
 
   return (
-    <group ref={rigRef} position={[0.38, -0.04, 0]} scale={1.08}>
+    <group ref={rigRef} position={[basePos.x, basePos.y, basePos.z]} scale={baseRigScale}>
       <SceneLights />
 
       {/* Variant “from” */}
@@ -161,6 +165,7 @@ function OrbitRig({
 
 function OrbitScene({
   className = "h-full w-full",
+  isMobile = false,
   fromPreset,
   toPreset,
   mixRef,
@@ -183,6 +188,7 @@ function OrbitScene({
     >
       <fog attach="fog" args={["#050816", 10, 18]} />
       <OrbitRig
+        isMobile={isMobile}
         fromPreset={fromPreset}
         toPreset={toPreset}
         mixRef={mixRef}

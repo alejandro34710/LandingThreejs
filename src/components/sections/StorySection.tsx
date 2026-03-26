@@ -61,7 +61,7 @@ function StorySection() {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       // Mantenemos el fondo oscuro en la base
-      className="relative min-h-screen overflow-hidden border-y border-white/5 bg-[#030014] flex items-center py-20 lg:py-0"
+      className="relative flex min-h-screen items-center overflow-x-clip overflow-y-hidden border-y border-white/5 bg-[#030014] py-16 lg:py-0"
     >
       {/* ================= BACKGROUND: CAMBIADO A Z-0 PARA QUE SEA VISIBLE ================= */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
@@ -108,23 +108,13 @@ function StorySection() {
       {/* ================= FIN DEL BACKGROUND ================= */}
 
       {/* CONTENIDO: Z-10 para asegurar que esté por encima del fondo */}
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-16 px-6 lg:grid-cols-12 lg:gap-8">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-8">
         
-        {/* Izquierda: Pieza escultórica (Modelo 3D) */}
-        <div className="relative lg:col-span-7 flex justify-center lg:justify-start">
-          <div
-            ref={visualRef}
-            className="relative w-full max-w-[600px] aspect-square lg:h-[700px] lg:w-auto drop-shadow-[0_0_40px_rgba(34,211,238,0.25)]"
-          >
-            <StoryVisual />
-          </div>
-        </div>
-
         {/* Derecha: Contenido editorial premium */}
-        <div className="relative flex flex-col justify-center lg:col-span-5 lg:pr-8">
+        <div className="relative order-1 flex min-w-0 flex-col justify-center lg:order-2 lg:col-span-5 lg:pr-8">
           
           <div className="stagger-item flex items-center">
-            <span className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300 backdrop-blur-xl shadow-[0_0_20px_rgba(34,211,238,0.15)]">
+            <span className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-cyan-300 backdrop-blur-xl shadow-[0_0_20px_rgba(34,211,238,0.15)] sm:px-4 sm:text-xs sm:tracking-[0.2em]">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
@@ -133,15 +123,15 @@ function StorySection() {
             </span>
           </div>
 
-          <h2 className="stagger-item mt-8 text-4xl font-light tracking-[-0.04em] text-transparent bg-clip-text bg-linear-to-br from-white via-white/95 to-white/50 sm:text-5xl lg:text-6xl leading-[1.1]">
+          <h2 className="stagger-item mt-7 max-w-full wrap-break-word text-3xl font-light leading-[1.1] tracking-[-0.02em] text-transparent bg-clip-text bg-linear-to-br from-white via-white/95 to-white/50 sm:mt-8 sm:text-5xl sm:tracking-[-0.04em] lg:text-6xl">
             {storyContent.title}
           </h2>
 
-          <p className="stagger-item mt-6 max-w-lg text-lg sm:text-xl font-light text-white/80 leading-relaxed">
+          <p className="stagger-item mt-5 max-w-full text-base leading-relaxed font-light text-white/80 sm:mt-6 sm:max-w-lg sm:text-xl">
             {storyContent.subtitle}
           </p>
 
-          <p className="stagger-item mt-4 max-w-lg text-sm sm:text-base font-light leading-relaxed text-white/40">
+          <p className="stagger-item mt-4 max-w-full text-sm font-light leading-relaxed text-white/40 sm:max-w-lg sm:text-base">
             {storyContent.paragraph}
           </p>
 
@@ -169,6 +159,16 @@ function StorySection() {
             <span>Interactive WebGL Experience</span>
           </div>
 
+        </div>
+
+        {/* Izquierda: Pieza escultórica (Modelo 3D) */}
+        <div className="relative order-2 flex justify-center lg:order-1 lg:col-span-7 lg:justify-start">
+          <div
+            ref={visualRef}
+            className="relative aspect-square w-full max-w-[340px] drop-shadow-[0_0_30px_rgba(34,211,238,0.22)] sm:max-w-[430px] lg:h-[700px] lg:max-w-[600px] lg:w-auto lg:drop-shadow-[0_0_40px_rgba(34,211,238,0.25)]"
+          >
+            <StoryVisual />
+          </div>
         </div>
       </div>
     </SectionContainer>

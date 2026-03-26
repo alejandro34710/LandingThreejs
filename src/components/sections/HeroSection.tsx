@@ -222,7 +222,7 @@ function HeroSection() {
       ref={sectionRef}
       id="hero"
       // Igualamos el color base al resto de la web
-      className="relative min-h-screen overflow-visible bg-[#030014]"
+      className="relative min-h-screen overflow-x-clip overflow-y-visible bg-[#030014]"
     >
       {/* --- FONDOS Y EFECTOS: Z-0 PARA GARANTIZAR VISIBILIDAD --- */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
@@ -271,15 +271,15 @@ function HeroSection() {
       </div>
 
       {/* CONTENIDO PRINCIPAL: Z-10 */}
-      <div className="relative z-10 mx-auto grid min-h-screen max-w-[1440px] grid-cols-1 items-center gap-12 px-6 pb-16 pt-28 md:px-10 md:pt-32 xl:grid-cols-[1fr_1fr] xl:px-16">
+      <div className="relative z-10 mx-auto grid min-h-screen max-w-[1440px] grid-cols-1 items-center gap-8 px-4 pb-10 pt-24 sm:px-6 sm:pt-28 md:gap-12 md:px-10 md:pb-16 md:pt-32 xl:grid-cols-[1fr_1fr] xl:px-16">
         
         {/* --- LADO IZQUIERDO (TEXTO) --- */}
         <div className="relative flex max-w-[640px] flex-col justify-center">
           
           {/* Eyebrow estilo HUD técnico */}
-          <div ref={eyebrowRef} className="mb-8 flex w-max items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 shadow-[0_0_15px_rgba(34,211,238,0.15)] backdrop-blur-md">
+          <div ref={eyebrowRef} className="mb-6 flex w-max items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 shadow-[0_0_15px_rgba(34,211,238,0.15)] backdrop-blur-md sm:mb-8 sm:px-4 sm:py-2">
             <span className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)] animate-pulse" />
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-300">
+            <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-cyan-300 sm:text-[10px] sm:tracking-[0.3em]">
               System Online // V.1.0
             </p>
           </div>
@@ -287,7 +287,7 @@ function HeroSection() {
           {/* Título Principal */}
           <h1
             ref={titleRef}
-            className="text-[64px] font-extrabold leading-[1.05] tracking-tight drop-shadow-xl md:text-[88px] xl:text-[110px]"
+            className="text-[56px] font-extrabold leading-[0.98] tracking-tight drop-shadow-xl sm:text-[64px] md:text-[88px] xl:text-[110px]"
           >
             <span
               ref={titleParallaxRef}
@@ -312,7 +312,7 @@ function HeroSection() {
           {/* Subtítulo */}
           <p
             ref={subtitleRef}
-            className="mt-8 max-w-[500px] text-lg leading-relaxed text-gray-300 drop-shadow-md md:text-xl font-light"
+            className="mt-6 max-w-[500px] text-base leading-relaxed text-gray-300 drop-shadow-md sm:mt-8 sm:text-lg md:text-xl font-light"
           >
             <span ref={subtitleParallaxRef} className="inline-block will-change-transform">
               {activePreset.subtitle}
@@ -320,10 +320,10 @@ function HeroSection() {
           </p>
 
           {/* Botones de Acción */}
-          <div ref={ctaRef} className="mt-12 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+          <div ref={ctaRef} className="mt-8 flex w-full flex-col items-stretch gap-4 sm:mt-12 sm:w-auto sm:flex-row sm:items-center sm:gap-6">
             {/* CTA Primario */}
-            <button className="group relative flex h-14 items-center justify-center overflow-hidden rounded-full border border-purple-500/40 bg-white/5 px-8 font-bold text-white shadow-[0_0_30px_rgba(168,85,247,0.2)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-purple-400 hover:bg-purple-600/20 hover:shadow-[0_0_40px_rgba(168,85,247,0.5)] focus:outline-none">
-              <span className="relative z-10 flex items-center gap-3 text-xs uppercase tracking-widest">
+            <button className="group relative flex h-12 w-full items-center justify-center overflow-hidden rounded-full border border-purple-500/40 bg-white/5 px-6 font-bold text-white shadow-[0_0_30px_rgba(168,85,247,0.2)] backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-purple-400 hover:bg-purple-600/20 hover:shadow-[0_0_40px_rgba(168,85,247,0.5)] focus:outline-none sm:h-14 sm:w-auto sm:px-8 sm:hover:scale-105">
+              <span className="relative z-10 flex items-center gap-3 text-[11px] uppercase tracking-[0.18em] sm:text-xs sm:tracking-widest">
                 Explore The Core
                 <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -333,7 +333,7 @@ function HeroSection() {
             </button>
             
             {/* Link Secundario con efecto de línea */}
-            <a href="#about" className="group relative flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 transition-colors hover:text-cyan-400">
+            <a href="#about" className="group relative inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 transition-colors hover:text-cyan-400 sm:text-xs sm:tracking-widest">
               <span className="relative">
                 View Capabilities
                 <span className="absolute -bottom-1 left-0 h-px w-0 bg-cyan-400 transition-all duration-300 group-hover:w-full shadow-[0_0_8px_rgba(34,211,238,0.8)]" />

@@ -41,7 +41,7 @@ function useFeatureNetworkScroll({
     const paths = pathRefs.current.filter(Boolean) as SVGPathElement[];
     const dots = dotRefs.current.filter(Boolean) as SVGCircleElement[];
 
-    if (cards.length === 0 || paths.length === 0 || dots.length === 0) return;
+    if (cards.length === 0) return;
 
     if (reducedMotion || isMobile) {
       previousCountRef.current = 4;
@@ -49,25 +49,28 @@ function useFeatureNetworkScroll({
       cards.forEach((card) => {
         gsap.set(card, { opacity: 1, y: 0, scale: 1 });
       });
+      if (paths.length > 0 && dots.length > 0) {
+        paths.forEach((path, index) => {
+          gsap.set(path, { opacity: 0.95, strokeDashoffset: 0 });
 
-      paths.forEach((path, index) => {
-        gsap.set(path, { opacity: 0.95, strokeDashoffset: 0 });
+          const dot = dots[index];
+          if (!dot) return;
 
-        const dot = dots[index];
-        if (!dot) return;
+          const length = path.getTotalLength();
+          const point = path.getPointAtLength(length);
 
-        const length = path.getTotalLength();
-        const point = path.getPointAtLength(length);
-
-        gsap.set(dot, {
-          opacity: 0.95,
-          scale: 1,
-          attr: { cx: point.x, cy: point.y },
+          gsap.set(dot, {
+            opacity: 0.95,
+            scale: 1,
+            attr: { cx: point.x, cy: point.y },
+          });
         });
-      });
+      }
 
       return;
     }
+
+    if (paths.length === 0 || dots.length === 0) return;
 
     const ctx = gsap.context(() => {
       cards.forEach((card) => {

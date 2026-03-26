@@ -64,7 +64,7 @@ function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbital
     if (!rig) return;
 
     const t = clock.getElapsedTime();
-    const idle = reducedMotion ? 0 : 1;
+    const idleAuto = reducedMotion ? 0 : 1;
 
     // Pulso por click: sube brillo y luego cae
     let pulse = 0;
@@ -88,29 +88,29 @@ function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbital
     parallaxCurrent.current.y = MathUtils.lerp(parallaxCurrent.current.y, pyT, 0.05);
 
     // Movimiento orgánico del Rig completo
-    const breath = 1 + Math.sin(t * 1.5) * 0.015 * idle;
-    const floatY = Math.sin(t * 0.8) * 0.05 * idle;
+    const breath = 1 + Math.sin(t * 1.5) * 0.015 * idleAuto;
+    const floatY = Math.sin(t * 0.8) * 0.05 * idleAuto;
 
     rig.rotation.x =
-      Math.sin(t * 0.3) * 0.05 * idle +
-      parallaxCurrent.current.y * 0.15 +
-      dragRef.current.y * 0.6 * idle;
+      Math.sin(t * 0.3) * 0.05 * idleAuto +
+      parallaxCurrent.current.y * 0.15 * idleAuto +
+      dragRef.current.y * 0.6;
     rig.rotation.y =
-      t * 0.05 * idle +
-      parallaxCurrent.current.x * 0.2 +
-      dragRef.current.x * 0.6 * idle;
-    rig.rotation.z = Math.sin(t * 0.2) * 0.02 * idle;
+      t * 0.05 * idleAuto +
+      parallaxCurrent.current.x * 0.2 * idleAuto +
+      dragRef.current.x * 0.6;
+    rig.rotation.z = Math.sin(t * 0.2) * 0.02 * idleAuto;
     rig.position.y = floatY;
     rig.scale.setScalar(breath * (1 + pulse * 0.03));
 
     // Animación del Núcleo (Core)
     if (outerCoreRef.current && innerCoreRef.current) {
-      outerCoreRef.current.rotation.y = t * 0.1 * idle;
-      outerCoreRef.current.rotation.z = t * 0.05 * idle;
+      outerCoreRef.current.rotation.y = t * 0.1 * idleAuto;
+      outerCoreRef.current.rotation.z = t * 0.05 * idleAuto;
       
-      const innerScale = 0.65 + Math.sin(t * 3) * 0.02 * idle;
+      const innerScale = 0.65 + Math.sin(t * 3) * 0.02 * idleAuto;
       innerCoreRef.current.scale.setScalar(innerScale * (1 + pulse * 0.08));
-      innerCoreRef.current.rotation.y = -t * 0.2 * idle;
+      innerCoreRef.current.rotation.y = -t * 0.2 * idleAuto;
 
       // Un poco más de energía visual con el pulso
       const innerMat = innerCoreRef.current.material as unknown as { emissiveIntensity?: number };
@@ -123,8 +123,8 @@ function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbital
     ringsRef.current.forEach((ringGroup, idx) => {
       if (!ringGroup) return;
       const data = ringsData[idx];
-      ringGroup.rotation.x = Math.sin(t * 0.1 + idx) * 0.2 * idle;
-      ringGroup.rotation.y = t * data.speed * idle;
+      ringGroup.rotation.x = Math.sin(t * 0.1 + idx) * 0.2 * idleAuto;
+      ringGroup.rotation.y = t * data.speed * idleAuto;
     });
 
     // Seguimiento de cámara suave
@@ -250,7 +250,7 @@ function FinalOrbitalObject({ parallax, reducedMotion }: FinalOrbitalObjectProps
   const quality = useMemo(() => {
     if (typeof window === "undefined") return { dpr: 1 };
     const isMobile = window.matchMedia?.("(max-width: 1023px)")?.matches ?? false;
-    return { dpr: isMobile ? 1 : 1.5 };
+    return { dpr: isMobile ? 1 : 1.25 };
   }, []);
 
   const isDragging = useRef(false);
@@ -267,14 +267,12 @@ function FinalOrbitalObject({ parallax, reducedMotion }: FinalOrbitalObjectProps
       dpr={[1, quality.dpr]}
       gl={{ antialias: true, alpha: true, logarithmicDepthBuffer: true }}
       onPointerDown={(e) => {
-        if (reducedMotion) return;
         isDragging.current = true;
         lastPointer.current = { x: e.clientX, y: e.clientY };
         // Captura para seguir recibiendo eventos aunque salgas del canvas
         e.currentTarget.setPointerCapture?.(e.pointerId);
       }}
       onPointerMove={(e) => {
-        if (reducedMotion) return;
         if (!isDragging.current) return;
         if (!lastPointer.current) {
           lastPointer.current = { x: e.clientX, y: e.clientY };
@@ -292,24 +290,26 @@ function FinalOrbitalObject({ parallax, reducedMotion }: FinalOrbitalObjectProps
         dragRef.current.y += dy * s;
       }}
       onPointerUp={(e) => {
-        if (reducedMotion) return;
         isDragging.current = false;
         lastPointer.current = null;
         e.currentTarget.releasePointerCapture?.(e.pointerId);
+      }}
+      onPointerCancel={() => {
+        isDragging.current = false;
+        lastPointer.current = null;
       }}
       onPointerLeave={() => {
         isDragging.current = false;
         lastPointer.current = null;
       }}
       onClick={() => {
-        if (reducedMotion) return;
         pulseRef.current.requested = true;
         pulseRef.current.t0 = performance.now() / 1000;
       }}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);
       }}
-      style={{ background: "transparent" }}
+      style={{ background: "transparent", touchAction: "none" }}
     >
       <fog attach="fog" args={["#020308", 8, 20]} /> 
       <ClosureRig parallax={parallax} reducedMotion={reducedMotion} dragRef={dragRef} pulseRef={pulseRef} />

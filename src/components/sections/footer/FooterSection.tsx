@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { footerColumns, footerLegalLinks } from "./footerData";
 
 function FooterSection() {
   const year = useMemo(() => new Date().getFullYear(), []);
+  const [openMobileColumn, setOpenMobileColumn] = useState<string>(footerColumns[0]?.title ?? "");
 
   return (
     <footer id="footer" className="relative overflow-hidden border-t border-white/10 bg-[#02040A]">
@@ -65,7 +66,7 @@ function FooterSection() {
 
           {/* --- COLUMNS --- */}
           <div className="lg:col-span-8">
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+            <div className="hidden grid-cols-1 gap-10 sm:grid-cols-3 lg:grid">
               {footerColumns.map((col) => (
                 <div key={col.title}>
                   <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.26em] text-white/65">
@@ -95,6 +96,53 @@ function FooterSection() {
                   </ul>
                 </div>
               ))}
+            </div>
+
+            <div className="space-y-3 lg:hidden">
+              {footerColumns.map((col) => {
+                const isOpen = openMobileColumn === col.title;
+                return (
+                  <div
+                    key={col.title}
+                    className="overflow-hidden rounded-2xl border border-white/10 bg-white/3 backdrop-blur-xl"
+                  >
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between px-4 py-3 text-left"
+                      aria-expanded={isOpen}
+                      onClick={() =>
+                        setOpenMobileColumn((prev) => (prev === col.title ? "" : col.title))
+                      }
+                    >
+                      <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em] text-white/70">
+                        <span className="h-1 w-1 rounded-full bg-cyan-400/80" />
+                        {col.title}
+                      </span>
+                      <span className="text-cyan-300">{isOpen ? "−" : "+"}</span>
+                    </button>
+
+                    <div
+                      className={`grid transition-all duration-300 ease-out ${
+                        isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                      }`}
+                    >
+                      <ul className="min-h-0 space-y-3 px-4 pb-4">
+                        {col.links.map((link) => (
+                          <li key={`${col.title}-${link.label}`}>
+                            <a
+                              href={link.href}
+                              className="inline-flex items-center gap-2 text-sm text-white/55 transition-colors duration-300 hover:text-cyan-300"
+                            >
+                              <span className="font-mono text-cyan-500/80">{">"}</span>
+                              {link.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

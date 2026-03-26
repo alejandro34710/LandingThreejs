@@ -210,7 +210,7 @@ function FeatureNetworkSection() {
 
         <div
           ref={stageRef}
-          className="group relative h-[82svh] min-h-[760px] max-h-[960px] overflow-hidden rounded-[40px] border border-white/10 p-px shadow-[0_20px_80px_-20px_rgba(139,92,246,0.3)]"
+          className={`group relative overflow-hidden border border-white/10 p-px shadow-[0_20px_80px_-20px_rgba(139,92,246,0.3)] ${isMobile ? "min-h-0 rounded-[28px]" : "h-[82svh] min-h-[760px] max-h-[960px] rounded-[40px]"}`}
         >
           <div className="absolute inset-0 z-0 bg-linear-to-br from-cyan-500/40 via-transparent to-fuchsia-500/40 opacity-80" />
 
@@ -249,101 +249,154 @@ function FeatureNetworkSection() {
               style={{ opacity: 0.15 + timelineProgress * 0.4 }}
             />
 
-            <div
-              ref={sphereWrapRef}
-          className="pointer-events-auto absolute left-1/2 top-1/2 z-20 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 cursor-grab hover:cursor-pointer active:cursor-grabbing touch-none select-none outline-none"
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            const isEnter = e.key === "Enter";
-            const isSpace = e.key === " ";
-            if (!isEnter && !isSpace) return;
-
-            e.preventDefault();
-            setSphereSelectedIndex((prev) => {
-              const next = (prev ?? -1) + 1;
-              return next >= featureNetworkItems.length ? 0 : next;
-            });
-          }}
-            >
-              <FeatureNetworkSphere
-                intensity={coreIntensity}
-                reducedMotion={reducedMotion}
-            onSphereClick={() => {
-              setSphereSelectedIndex((prev) => {
-                const next = (prev ?? -1) + 1;
-                return next >= featureNetworkItems.length ? 0 : next;
-              });
-            }}
-              />
-            </div>
-
-            <FeatureConnectionLines
-              items={featureNetworkItems}
-              activeCount={activeCount}
-          highlightIndex={hoverIndex ?? sphereSelectedIndex}
-              pathRefs={pathRefs}
-              dotRefs={dotRefs}
-              mobile={isMobile}
-            />
-
-            {featureNetworkItems.map((item, index) => {
-              const position = isMobile
-                ? item.position.mobile
-                : item.position.desktop;
-
-              return (
+            {isMobile ? (
+              <div className="relative z-30 flex flex-col gap-5 p-4">
                 <div
-                  key={item.id}
-                  ref={(node) => {
-                    cardRefs.current[index] = node;
-                  }}
-                  className="absolute left-0 top-0 z-30 -translate-x-1/2 -translate-y-1/2"
-                  style={{
-                    left: `${position.x}%`,
-                    top: `${position.y}%`,
+                  ref={sphereWrapRef}
+                  className="mx-auto h-[220px] w-[220px] touch-none select-none"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    const isEnter = e.key === "Enter";
+                    const isSpace = e.key === " ";
+                    if (!isEnter && !isSpace) return;
+                    e.preventDefault();
+                    setSphereSelectedIndex((prev) => {
+                      const next = (prev ?? -1) + 1;
+                      return next >= featureNetworkItems.length ? 0 : next;
+                    });
                   }}
                 >
-                  <FeatureNodeCard
-                    item={item}
-                    index={index}
-                    active={index < activeCount}
-                    emphasized={
-                      hoverIndex === index || (hoverIndex === null && sphereSelectedIndex === index)
-                    }
-                    onHover={setHoverIndex}
-                    onFocus={setHoverIndex}
-                  />
-                </div>
-              );
-            })}
-
-            <div
-              ref={hudWrapRef}
-              className="pointer-events-none absolute inset-x-0 bottom-10 z-40 flex justify-center"
-            >
-              <div className="flex items-center gap-5 rounded-2xl border border-white/10 bg-[#02040A]/90 px-6 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-xl">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 animate-pulse rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-cyan-100/70">
-                    System Link
-                  </span>
-                </div>
-
-                <div className="h-1.5 w-32 overflow-hidden rounded-full border border-white/5 bg-white/5">
-                  <div
-                  className="h-full bg-linear-to-r from-cyan-400 via-indigo-400 to-fuchsia-500 shadow-[0_0_12px_rgba(192,132,252,0.8)] transition-all duration-300 ease-out"
-                    style={{
-                      width: `${Math.max(5, timelineProgress * 100)}%`,
+                  <FeatureNetworkSphere
+                    intensity={coreIntensity}
+                    reducedMotion={reducedMotion}
+                    onSphereClick={() => {
+                      setSphereSelectedIndex((prev) => {
+                        const next = (prev ?? -1) + 1;
+                        return next >= featureNetworkItems.length ? 0 : next;
+                      });
                     }}
                   />
                 </div>
 
-                <span className="w-10 text-right font-mono text-[11px] font-semibold text-fuchsia-300">
-                  {Math.round(timelineProgress * 100)}%
-                </span>
+                <div className="grid grid-cols-1 justify-items-center gap-4 pb-4">
+                  {featureNetworkItems.map((item, index) => (
+                    <div
+                      key={item.id}
+                      ref={(node) => {
+                        cardRefs.current[index] = node;
+                      }}
+                      className="relative flex w-full justify-center"
+                    >
+                      <FeatureNodeCard
+                        item={item}
+                        index={index}
+                        active={true}
+                        emphasized={sphereSelectedIndex === index}
+                        onHover={setHoverIndex}
+                        onFocus={setHoverIndex}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <>
+                <div
+                  ref={sphereWrapRef}
+                  className="pointer-events-auto absolute left-1/2 top-1/2 z-20 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 cursor-grab hover:cursor-pointer active:cursor-grabbing touch-none select-none outline-none"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    const isEnter = e.key === "Enter";
+                    const isSpace = e.key === " ";
+                    if (!isEnter && !isSpace) return;
+
+                    e.preventDefault();
+                    setSphereSelectedIndex((prev) => {
+                      const next = (prev ?? -1) + 1;
+                      return next >= featureNetworkItems.length ? 0 : next;
+                    });
+                  }}
+                >
+                  <FeatureNetworkSphere
+                    intensity={coreIntensity}
+                    reducedMotion={reducedMotion}
+                    onSphereClick={() => {
+                      setSphereSelectedIndex((prev) => {
+                        const next = (prev ?? -1) + 1;
+                        return next >= featureNetworkItems.length ? 0 : next;
+                      });
+                    }}
+                  />
+                </div>
+
+                <FeatureConnectionLines
+                  items={featureNetworkItems}
+                  activeCount={activeCount}
+                  highlightIndex={hoverIndex ?? sphereSelectedIndex}
+                  pathRefs={pathRefs}
+                  dotRefs={dotRefs}
+                  mobile={isMobile}
+                />
+
+                {featureNetworkItems.map((item, index) => {
+                  const position = item.position.desktop;
+
+                  return (
+                    <div
+                      key={item.id}
+                      ref={(node) => {
+                        cardRefs.current[index] = node;
+                      }}
+                      className="absolute left-0 top-0 z-30 -translate-x-1/2 -translate-y-1/2"
+                      style={{
+                        left: `${position.x}%`,
+                        top: `${position.y}%`,
+                      }}
+                    >
+                      <FeatureNodeCard
+                        item={item}
+                        index={index}
+                        active={index < activeCount}
+                        emphasized={
+                          hoverIndex === index || (hoverIndex === null && sphereSelectedIndex === index)
+                        }
+                        onHover={setHoverIndex}
+                        onFocus={setHoverIndex}
+                      />
+                    </div>
+                  );
+                })}
+
+                <div
+                  ref={hudWrapRef}
+                  className="pointer-events-none absolute inset-x-0 bottom-10 z-40 flex justify-center"
+                >
+                  <div className="flex items-center gap-5 rounded-2xl border border-white/10 bg-[#02040A]/90 px-6 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-xl">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 animate-pulse rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                      <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-cyan-100/70">
+                        System Link
+                      </span>
+                    </div>
+
+                    <div className="h-1.5 w-32 overflow-hidden rounded-full border border-white/5 bg-white/5">
+                      <div
+                        className="h-full bg-linear-to-r from-cyan-400 via-indigo-400 to-fuchsia-500 shadow-[0_0_12px_rgba(192,132,252,0.8)] transition-all duration-300 ease-out"
+                        style={{
+                          width: `${Math.max(5, timelineProgress * 100)}%`,
+                        }}
+                      />
+                    </div>
+
+                    <span className="w-10 text-right font-mono text-[11px] font-semibold text-fuchsia-300">
+                      {Math.round(timelineProgress * 100)}%
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

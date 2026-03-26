@@ -11,7 +11,7 @@ function PageShell() {
   useSmoothScroll();
 
   return (
-    <div className="min-h-screen bg-[#02040A] text-white">
+    <div className="min-h-screen overflow-x-clip bg-[#02040A] text-white">
       <Navbar />
 
       <main className="pt-16 sm:pt-16">

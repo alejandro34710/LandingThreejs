@@ -16,7 +16,13 @@ import {
 } from "three";
 import type { StoryInteractionValue } from "./useStoryInteraction";
 
-function TwinkleSpheresBackground({ reducedMotion }: { reducedMotion: boolean }) {
+function TwinkleSpheresBackground({
+  reducedMotion,
+  isMobile,
+}: {
+  reducedMotion: boolean;
+  isMobile: boolean;
+}) {
   const sphereMeshesRef = useRef<Mesh[]>([]);
 
   const mulberry32 = (seed: number) => {
@@ -31,7 +37,7 @@ function TwinkleSpheresBackground({ reducedMotion }: { reducedMotion: boolean })
   };
 
   const spheres = useMemo(() => {
-    const count = 90;
+    const count = isMobile ? 40 : 90;
     const rand = mulberry32(133742069);
 
     return Array.from({ length: count }, () => {
@@ -51,7 +57,7 @@ function TwinkleSpheresBackground({ reducedMotion }: { reducedMotion: boolean })
 
       return { x, y, z, radius, phase, speed, twinkleBias, baseColor };
     });
-  }, []);
+  }, [isMobile]);
 
   useFrame(({ clock }) => {
     if (reducedMotion) return;
@@ -104,9 +110,11 @@ function TwinkleSpheresBackground({ reducedMotion }: { reducedMotion: boolean })
 function PremiumMobiusImpl({
   interaction,
   reducedMotion,
+  isMobile,
 }: {
   interaction: MutableRefObject<StoryInteractionValue>;
   reducedMotion: boolean;
+  isMobile: boolean;
 }) {
   const groupRef = useRef<Group | null>(null);
   const outerGlassRef = useRef<MeshPhysicalMaterial | null>(null);
@@ -189,6 +197,10 @@ function PremiumMobiusImpl({
     }
   });
 
+  const knotSegments = isMobile ? 128 : 200;
+  const knotSidesInner = isMobile ? 20 : 32;
+  const knotSidesOuter = isMobile ? 28 : 48;
+
   return (
     <group ref={groupRef}>
       <Float
@@ -197,7 +209,7 @@ function PremiumMobiusImpl({
         floatIntensity={0.45}
       >
         <mesh scale={0.88}>
-          <torusKnotGeometry args={[0.9, 0.25, 200, 32]} />
+          <torusKnotGeometry args={[0.9, 0.25, knotSegments, knotSidesInner]} />
           <meshPhysicalMaterial
             ref={innerCoreRef}
             color="#220044"
@@ -210,7 +222,7 @@ function PremiumMobiusImpl({
         </mesh>
 
         <mesh scale={1}>
-          <torusKnotGeometry args={[0.9, 0.3, 200, 48]} />
+          <torusKnotGeometry args={[0.9, 0.3, knotSegments, knotSidesOuter]} />
           <meshPhysicalMaterial
             ref={outerGlassRef}
             color="#f8fbff"
@@ -236,19 +248,23 @@ function PremiumMobiusImpl({
 function SceneContent({
   interactionRef,
   reducedMotion,
+  isMobile,
 }: {
   interactionRef: MutableRefObject<StoryInteractionValue>;
   reducedMotion: boolean;
+  isMobile: boolean;
 }) {
   return (
     <>
-      <TwinkleSpheresBackground reducedMotion={reducedMotion} />
+      <TwinkleSpheresBackground reducedMotion={reducedMotion} isMobile={isMobile} />
 
-      <Environment
-        preset="city"
-        background={false}
-        blur={0.6}
-      />
+      {!isMobile ? (
+        <Environment
+          preset="city"
+          background={false}
+          blur={0.6}
+        />
+      ) : null}
 
       <ambientLight intensity={0.45} />
       <directionalLight position={[5, 5, 5]} intensity={1.6} color="#e0c3fc" />
@@ -257,6 +273,7 @@ function SceneContent({
       <PremiumMobiusImpl
         interaction={interactionRef}
         reducedMotion={reducedMotion}
+        isMobile={isMobile}
       />
 
       <Preload all />
@@ -267,16 +284,18 @@ function SceneContent({
 function StoryAbstractSculpture({
   interactionRef,
   reducedMotion,
+  isMobile,
 }: {
   interactionRef: MutableRefObject<StoryInteractionValue>;
   reducedMotion: boolean;
+  isMobile: boolean;
 }) {
   return (
     <Canvas
       className="h-full w-full"
       camera={{ position: [0, 0, 5], fov: 45 }}
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true }}
+      dpr={isMobile ? [1, 1.25] : [1, 2]}
+      gl={{ antialias: !isMobile, alpha: true, powerPreference: isMobile ? "high-performance" : "default" }}
       frameloop={reducedMotion ? "demand" : "always"}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);
@@ -286,6 +305,7 @@ function StoryAbstractSculpture({
         <SceneContent
           interactionRef={interactionRef}
           reducedMotion={reducedMotion}
+          isMobile={isMobile}
         />
       </Suspense>
     </Canvas>

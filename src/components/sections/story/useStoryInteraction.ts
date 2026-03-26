@@ -94,7 +94,7 @@ function useStoryInteraction({ containerRef }: UseStoryInteractionArgs) {
 
   const pulseRafRef = useRef<number | null>(null);
 
-  const canDrag = useMemo(() => !reducedMotion && !isMobile, [reducedMotion, isMobile]);
+  const canDrag = useMemo(() => !reducedMotion, [reducedMotion]);
 
   useEffect(() => {
     const el = containerRef.current;

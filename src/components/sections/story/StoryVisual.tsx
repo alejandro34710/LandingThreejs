@@ -22,7 +22,7 @@ function StoryVisual({
   return (
     <div
       ref={containerRef}
-      className="relative h-full w-full"
+      className="relative h-full w-full touch-none select-none"
       // Drag/parallax se resuelve vía listeners en el hook.
     >
       {/* Halo DOM detrás del objeto (responde a hover en el canvas) */}
@@ -37,7 +37,8 @@ function StoryVisual({
       <div className="relative h-full w-full">
         <StoryAbstractSculpture
           interactionRef={interactionRef}
-          reducedMotion={reducedMotion || isMobile}
+          reducedMotion={reducedMotion}
+          isMobile={isMobile}
         />
       </div>
 
