@@ -22,7 +22,7 @@ function StoryVisual({
   return (
     <div
       ref={containerRef}
-      className="relative h-full w-full touch-none select-none"
+      className="r3f-surface relative h-full w-full touch-none select-none"
       // Drag/parallax se resuelve vía listeners en el hook.
     >
       {/* Halo DOM detrás del objeto (responde a hover en el canvas) */}

@@ -5,8 +5,10 @@ import ManifestCard from "./manifest/ManifestCard";
 import { manifestCards } from "./manifest/manifestData";
 import ManifestAmbientScene from "./manifest/ManifestAmbientScene";
 import useManifestMouseField from "./manifest/useManifestMouseField";
+import usePerformanceMode from "../../hooks/usePerformanceMode";
 
 function ManifestSection() {
+  const { isLowPowerMode } = usePerformanceMode();
   const sectionRef = useRef<HTMLElement | null>(null);
   const badgeRef = useRef<HTMLParagraphElement | null>(null);
   const headlineRef = useRef<HTMLHeadingElement | null>(null);
@@ -142,8 +144,12 @@ function ManifestSection() {
 
         {/* 2. Órbitas Tecnológicas animadas (Centradas arriba para enmarcar el título) */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center justify-center opacity-60">
-          <div className="absolute h-[1200px] w-[1200px] animate-[spin_50s_linear_infinite] rounded-full border border-dashed border-indigo-500/30" />
-          <div className="absolute h-[900px] w-[900px] animate-[spin_35s_linear_infinite_reverse] rounded-full border border-dotted border-violet-400/40" />
+          <div
+            className={`absolute h-[1200px] w-[1200px] rounded-full border border-dashed border-indigo-500/30 ${isLowPowerMode ? "" : "animate-[spin_50s_linear_infinite]"}`}
+          />
+          <div
+            className={`absolute h-[900px] w-[900px] rounded-full border border-dotted border-violet-400/40 ${isLowPowerMode ? "" : "animate-[spin_35s_linear_infinite_reverse]"}`}
+          />
           <div className="absolute h-[600px] w-[600px] rounded-full border border-white/10" />
         </div>
 

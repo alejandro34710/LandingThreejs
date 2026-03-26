@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import SectionContainer from "../../layout/SectionContainer";
 import { gsap } from "../../../lib/gsap";
 import FinalOrbitalObject from "./FinalOrbitalObject";
+import usePerformanceMode from "../../../hooks/usePerformanceMode";
 
 type Parallax = { x: number; y: number; rawX: number; rawY: number };
 
@@ -25,6 +26,7 @@ function FinalCtaSection() {
 
   // Estado para las estrellas fugaces
   const [shootingStars, setShootingStars] = useState<Star[]>([]);
+  const { isLowPowerMode } = usePerformanceMode();
 
   // Tarjeta estática: sin parallax por movimiento del mouse
   const parallax = useMemo<Parallax>(() => ({ x: 0, y: 0, rawX: -1000, rawY: -1000 }), []);
@@ -37,7 +39,7 @@ function FinalCtaSection() {
   // Generación de estrellas y animaciones GSAP
   useEffect(() => {
     // 1. Generar estrellas aleatorias de forma segura para SSR/Hidratación
-    const generateStars = Array.from({ length: 8 }).map((_, i) => ({
+    const generateStars = Array.from({ length: isLowPowerMode ? 3 : 8 }).map((_, i) => ({
       id: i,
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
@@ -55,6 +57,7 @@ function FinalCtaSection() {
       return;
     }
 
+    const loopingTweens: gsap.core.Tween[] = [];
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         defaults: { ease: "power4.out" },
@@ -86,22 +89,38 @@ function FinalCtaSection() {
         ease: "back.out(1.5)"
       }, "-=1");
 
-      gsap.to(".ambient-glow", {
-        scale: 1.1,
-        opacity: 0.8,
-        duration: 4,
-        yoyo: true,
-        repeat: -1,
-        ease: "sine.inOut",
-        stagger: 2,
-      });
+      if (!isLowPowerMode) {
+        const tween = gsap.to(".ambient-glow", {
+          scale: 1.1,
+          opacity: 0.8,
+          duration: 4,
+          yoyo: true,
+          repeat: -1,
+          ease: "sine.inOut",
+          stagger: 2,
+        });
+        loopingTweens.push(tween);
+      }
     }, section);
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!isLowPowerMode) return;
+        loopingTweens.forEach((tween) => {
+          if (entry.isIntersecting) tween.resume();
+          else tween.pause();
+        });
+      },
+      { threshold: 0.05 },
+    );
+    io.observe(section);
 
     return () => {
       window.clearTimeout(starTimer);
+      io.disconnect();
       ctx.revert();
     };
-  }, []);
+  }, [isLowPowerMode]);
 
   return (
     <SectionContainer
@@ -124,7 +143,7 @@ function FinalCtaSection() {
               left: star.left,
               background: "linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.8), transparent)",
               boxShadow: "0 0 10px rgba(34, 211, 238, 0.4)",
-              animation: `meteor ${star.duration} linear ${star.delay} infinite`,
+              animation: isLowPowerMode ? "none" : `meteor ${star.duration} linear ${star.delay} infinite`,
             }}
           />
         ))}
@@ -194,7 +213,7 @@ function FinalCtaSection() {
         <div className="lg:col-span-6 xl:col-span-7 perspective-[1000px]">
           <div
             ref={panelRef}
-            className="group relative mx-auto aspect-square w-full max-w-[560px] overflow-hidden border border-white/5 bg-[#040610]/80 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)] backdrop-blur-xl lg:ml-auto lg:max-w-[620px]"
+            className="r3f-surface group relative mx-auto aspect-square w-full max-w-[560px] overflow-hidden border border-white/5 bg-[#040610]/80 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)] backdrop-blur-xl lg:ml-auto lg:max-w-[620px]"
           >
             {/* Spotlight y Bordes */}
             <div
@@ -218,7 +237,11 @@ function FinalCtaSection() {
             <div className="absolute right-4 top-4 h-4 w-4 border-r-2 border-t-2 border-cyan-500/40" />
             <div className="absolute left-4 bottom-4 h-4 w-4 border-l-2 border-b-2 border-cyan-500/40" />
             <div className="absolute right-4 bottom-4 h-4 w-4 border-r-2 border-b-2 border-cyan-500/40" />
-            <div className="pointer-events-none absolute left-0 right-0 h-[2px] w-full bg-cyan-500/20 blur-[1px] animate-[scan_4s_ease-in-out_infinite]" />
+            <div
+              className={`pointer-events-none absolute left-0 right-0 h-[2px] w-full bg-cyan-500/20 blur-[1px] ${
+                isLowPowerMode ? "" : "animate-[scan_4s_ease-in-out_infinite]"
+              }`}
+            />
 
             <div className="relative z-10 flex h-full w-full flex-col justify-end p-6">
               

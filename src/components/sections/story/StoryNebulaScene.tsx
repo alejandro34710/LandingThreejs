@@ -3,6 +3,7 @@ import { Environment, Float } from "@react-three/drei";
 import { useRef, type MutableRefObject } from "react";
 import { Group, MeshPhysicalMaterial, AdditiveBlending, Mesh } from "three";
 import type { StoryInteractionValue } from "./useStoryInteraction";
+import usePerformanceMode from "../../../hooks/usePerformanceMode";
 
 function QuantumPrismImpl({
   interaction,
@@ -154,15 +155,17 @@ function StoryNebulaScene({
   interactionRef: MutableRefObject<StoryInteractionValue>;
   reducedMotion: boolean;
 }) {
+  const { isLowPowerMode } = usePerformanceMode();
+
   return (
     <Canvas
       className="h-full w-full"
       camera={{ position: [0, 0, 6], fov: 40 }}
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true }}
+      dpr={isLowPowerMode ? [1, 1] : [1, 1.5]}
+      gl={{ antialias: !isLowPowerMode, alpha: true }}
       frameloop={reducedMotion ? "demand" : "always"}
     >
-      <Environment preset="studio" />
+      {!isLowPowerMode ? <Environment preset="studio" /> : null}
       <ambientLight intensity={0.2} />
       <pointLight position={[3, 3, 3]} intensity={3} color="#00e5ff" />
       <pointLight position={[-3, -3, -3]} intensity={2} color="#ff00e5" />

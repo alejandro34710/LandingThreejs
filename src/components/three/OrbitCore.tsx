@@ -19,9 +19,10 @@ type OrbitCoreProps = {
   mixRef: MutableRefObject<{ value: number }>;
   weightMode: "from" | "to";
   orbitStoryRef: MutableRefObject<OrbitStoryValues>;
+  isMobile?: boolean;
 };
 
-function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps) {
+function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef, isMobile = false }: OrbitCoreProps) {
   const AURA_SCALE = 2.08;
   const OUTER_SCALE = 1.08;
   const WIRE_SCALE = 0.54;
@@ -32,6 +33,10 @@ function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps
     if (preset.visualPreset === "energetic") return 0.46;
     return 0.58;
   }, [preset.visualPreset]);
+  const sphereSegments = isMobile ? 36 : 80;
+  const auraSegments = isMobile ? 28 : 64;
+  const accentSegments = isMobile ? 12 : 18;
+  const sparklesCount = isMobile ? 22 : 48;
 
   const auraMatRef = useRef<MeshBasicMaterial | null>(null);
   const outerMatRef = useRef<MeshPhysicalMaterial | null>(null);
@@ -231,7 +236,7 @@ function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps
     <group scale={preset.visuals.coreScale}>
       {/* AURA MUY SUAVE */}
       <mesh scale={AURA_SCALE}>
-        <sphereGeometry args={[1, 64, 64]} />
+        <sphereGeometry args={[1, auraSegments, auraSegments]} />
         <meshBasicMaterial
           ref={auraMatRef}
           color={preset.theme.auraColor}
@@ -247,7 +252,7 @@ function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps
 
       {/* SHELL EXTERNO (glass/transmission) */}
       <mesh scale={OUTER_SCALE}>
-        <sphereGeometry args={[1, 80, 80]} />
+        <sphereGeometry args={[1, sphereSegments, sphereSegments]} />
         <meshPhysicalMaterial
           ref={outerMatRef}
           color={preset.theme.coreOuterColor}
@@ -273,7 +278,7 @@ function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps
 
       {/* CORE WIRE (detalle/luminosidad) */}
       <mesh scale={WIRE_SCALE}>
-        <sphereGeometry args={[1, 80, 80]} />
+        <sphereGeometry args={[1, sphereSegments, sphereSegments]} />
         <meshPhysicalMaterial
           ref={mainMatRef}
           color={preset.theme.haloColorSecondary}
@@ -300,7 +305,7 @@ function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps
 
       {/* RIM MUY DISCRETO */}
       <mesh scale={1.018}>
-        <sphereGeometry args={[1, 80, 80]} />
+        <sphereGeometry args={[1, sphereSegments, sphereSegments]} />
         <meshBasicMaterial
           ref={rimMatRef}
           color={preset.theme.haloColorSecondary}
@@ -316,7 +321,7 @@ function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps
 
       {/* NÚCLEO INTERIOR DENSO */}
       <mesh scale={INNER_SCALE}>
-        <sphereGeometry args={[1, 80, 80]} />
+        <sphereGeometry args={[1, sphereSegments, sphereSegments]} />
         <meshPhysicalMaterial
           ref={innerMatRef}
           color={preset.theme.coreInnerColor}
@@ -338,10 +343,10 @@ function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps
 
       {/* Sparkles (similar al showcase inferior) */}
       <Sparkles
-        count={48}
+        count={sparklesCount}
         scale={2.45}
         size={1.4}
-        speed={0.44}
+        speed={isMobile ? 0.28 : 0.44}
         color={preset.theme.glowColor}
         opacity={sparkleOpacity}
         noise={0.55}
@@ -356,7 +361,12 @@ function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps
           rotation={halo.rotation}
         >
           <torusGeometry
-            args={[halo.radius, halo.tube, halo.radialSegments ?? 16, halo.tubularSegments ?? 160]}
+            args={[
+              halo.radius,
+              halo.tube,
+              isMobile ? Math.min(10, halo.radialSegments ?? 16) : halo.radialSegments ?? 16,
+              isMobile ? Math.min(64, halo.tubularSegments ?? 160) : halo.tubularSegments ?? 160,
+            ]}
           />
           <meshStandardMaterial
             ref={(node) => {
@@ -377,7 +387,7 @@ function OrbitCore({ preset, mixRef, weightMode, orbitStoryRef }: OrbitCoreProps
 
       {preset.visuals.accents.map((accent, idx) => (
         <mesh key={`${preset.id}-accent-${idx}`} position={accent.position}>
-          <sphereGeometry args={[accent.size, 18, 18]} />
+          <sphereGeometry args={[accent.size, accentSegments, accentSegments]} />
           <meshBasicMaterial
             ref={(node) => {
               accentMatRefs.current[idx] = node;

@@ -105,6 +105,7 @@ function HeroOrbitalShowcase({
   // Mientras el hero está pineado, GSAP/ScrollTrigger controla estos valores (sin pelear).
   useEffect(() => {
     if (isInteractionLocked) return;
+    if (isMobile) return;
     const chipLeft = chipLeftRef.current;
     const chipRight = chipRightRef.current;
     if (!chipLeft || !chipRight) return;
@@ -137,7 +138,7 @@ function HeroOrbitalShowcase({
       leftTween.kill();
       rightTween.kill();
     };
-  }, [chipLeftRef, chipRightRef, isInteractionLocked]);
+  }, [chipLeftRef, chipRightRef, isInteractionLocked, isMobile]);
 
   useEffect(() => {
     const chipLeft = chipLeftRef.current;
@@ -221,7 +222,7 @@ function HeroOrbitalShowcase({
       >
         <div
           ref={showcaseFrameRef}
-          className="pointer-events-none relative h-[430px] w-[430px] sm:h-[320px] sm:w-[320px] md:h-[680px] md:w-[680px] xl:h-[800px] xl:w-[800px]"
+          className="r3f-surface pointer-events-none relative h-[430px] w-[430px] sm:h-[320px] sm:w-[320px] md:h-[680px] md:w-[680px] xl:h-[800px] xl:w-[800px]"
         >
           <OrbitScene
             className="pointer-events-none absolute inset-0 h-full w-full object-contain"

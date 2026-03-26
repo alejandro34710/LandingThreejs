@@ -380,14 +380,6 @@ function useHeroScrollTimeline({
           0.55
         )
         .to(
-          manifestContent,
-          {
-            x: () => handoffTargets.manifestDx,
-            duration: 0.45,
-          },
-          0.55
-        )
-        .to(
           [chipLeft, chipRight],
           {
             opacity: 0.68,
@@ -405,6 +397,17 @@ function useHeroScrollTimeline({
           },
           0.55
         );
+
+      if (manifestContent) {
+        tl.to(
+          manifestContent,
+          {
+            x: () => handoffTargets.manifestDx,
+            duration: 0.45,
+          },
+          0.55,
+        );
+      }
 
       // ACTO 3 — TRANSITION OUT (80 - 100%)
       tl.to(
@@ -507,17 +510,20 @@ function useHeroScrollTimeline({
       }
 
       // Initial state must match on refresh / resize.
-      ScrollTrigger.refresh();
+      if (!isMobile) ScrollTrigger.refresh();
     });
 
+    let resizeTimer = 0;
     const onResize = () => {
-      window.setTimeout(() => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
         ScrollTrigger.refresh();
-      }, 80);
+      }, isMobile ? 180 : 90);
     };
     window.addEventListener("resize", onResize);
 
     return () => {
+      window.clearTimeout(resizeTimer);
       ctx.revert();
       window.removeEventListener("resize", onResize);
       setIsStoryActive(false);

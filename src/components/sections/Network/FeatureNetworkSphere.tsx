@@ -7,6 +7,7 @@ import {
 } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import { Group, MathUtils, Mesh } from "three";
+import usePerformanceMode from "../../../hooks/usePerformanceMode";
 
 type FeatureNetworkSphereProps = {
   intensity: number;
@@ -18,7 +19,8 @@ function CoreMesh({
   intensity,
   reducedMotion,
   onSphereClick,
-}: FeatureNetworkSphereProps) {
+  isLowPowerMode,
+}: FeatureNetworkSphereProps & { isLowPowerMode: boolean }) {
   const rootRef = useRef<Group | null>(null);
   const orbRef = useRef<Mesh | null>(null);
   const coreRef = useRef<Mesh | null>(null);
@@ -234,27 +236,38 @@ function CoreMesh({
       {/* esfera exterior interactiva */}
       <Sphere
         ref={orbRef}
-        args={[0.9, 64, 64]}
+        args={[0.9, isLowPowerMode ? 28 : 64, isLowPowerMode ? 28 : 64]}
         onPointerDown={handlePointerDown}
         onPointerUp={(e) => e.stopPropagation()}
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
         onClick={handleClick}
       >
-        <MeshTransmissionMaterial
-          backside
-          backsideThickness={0.3}
-          thickness={0.5}
-          chromaticAberration={0.4}
-          anisotropy={0.8}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
-          envMapIntensity={0}
-          roughness={0.18}
-          transmission={0.35}
-          ior={1.32}
-          color="#e0f2fe"
-        />
+        {isLowPowerMode ? (
+          <meshPhysicalMaterial
+            color="#e0f2fe"
+            roughness={0.28}
+            metalness={0.4}
+            clearcoat={0.5}
+            transparent
+            opacity={0.88}
+          />
+        ) : (
+          <MeshTransmissionMaterial
+            backside
+            backsideThickness={0.3}
+            thickness={0.5}
+            chromaticAberration={0.4}
+            anisotropy={0.8}
+            clearcoat={1}
+            clearcoatRoughness={0.1}
+            envMapIntensity={0}
+            roughness={0.18}
+            transmission={0.35}
+            ior={1.32}
+            color="#e0f2fe"
+          />
+        )}
       </Sphere>
 
       {/* núcleo wireframe */}
@@ -307,7 +320,7 @@ function CoreMesh({
 
       {!reducedMotion && (
         <Sparkles
-          count={60}
+          count={isLowPowerMode ? 24 : 60}
           scale={2.5}
           size={1.5}
           speed={0.4}
@@ -325,9 +338,10 @@ function FeatureNetworkSphere({
   reducedMotion,
   onSphereClick,
 }: FeatureNetworkSphereProps) {
+  const { isLowPowerMode } = usePerformanceMode();
   const dpr = useMemo<[number, number]>(
-    () => (reducedMotion ? [1, 1] : [1, 1.5]),
-    [reducedMotion],
+    () => (reducedMotion || isLowPowerMode ? [1, 1] : [1, 1.4]),
+    [reducedMotion, isLowPowerMode],
   );
 
   return (
@@ -351,11 +365,11 @@ function FeatureNetworkSphere({
       />
       <spotLight
         position={[3, 3, 4]}
-        intensity={4}
+        intensity={isLowPowerMode ? 2.4 : 4}
         color="#60a5fa"
         angle={0.5}
         penumbra={1}
-        castShadow
+        castShadow={!isLowPowerMode}
       />
       <spotLight
         position={[-3, -3, 4]}
@@ -376,6 +390,7 @@ function FeatureNetworkSphere({
         intensity={intensity}
         reducedMotion={reducedMotion}
         onSphereClick={onSphereClick}
+        isLowPowerMode={isLowPowerMode}
       />
     </Canvas>
   );

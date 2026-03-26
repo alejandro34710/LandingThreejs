@@ -150,13 +150,25 @@ function OrbitRig({
 
       {/* Variant “from” */}
       <group ref={fromGroupRef}>
-        <OrbitCore preset={fromPreset} mixRef={mixRef} weightMode="from" orbitStoryRef={orbitStoryRef} />
+        <OrbitCore
+          preset={fromPreset}
+          mixRef={mixRef}
+          weightMode="from"
+          orbitStoryRef={orbitStoryRef}
+          isMobile={isMobile}
+        />
         <OrbitParticles preset={fromPreset} mixRef={mixRef} weightMode="from" orbitStoryRef={orbitStoryRef} />
       </group>
 
       {/* Variant “to” */}
       <group ref={toGroupRef}>
-        <OrbitCore preset={toPreset} mixRef={mixRef} weightMode="to" orbitStoryRef={orbitStoryRef} />
+        <OrbitCore
+          preset={toPreset}
+          mixRef={mixRef}
+          weightMode="to"
+          orbitStoryRef={orbitStoryRef}
+          isMobile={isMobile}
+        />
         <OrbitParticles preset={toPreset} mixRef={mixRef} weightMode="to" orbitStoryRef={orbitStoryRef} />
       </group>
     </group>
@@ -175,12 +187,16 @@ function OrbitScene({
   parallaxRef,
   orbitStoryRef,
 }: OrbitSceneProps) {
+  const quality = isMobile
+    ? { dpr: 1, antialias: false }
+    : { dpr: 1.25, antialias: true };
+
   return (
     <Canvas
       className={className}
       camera={{ position: [0, 0, 10.4], fov: 34 }}
-      dpr={[1, 1.25]}
-      gl={{ antialias: true, alpha: true }}
+      dpr={[1, quality.dpr]}
+      gl={{ antialias: quality.antialias, alpha: true }}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);
       }}

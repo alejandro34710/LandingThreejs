@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
+import { useMemo, useRef, type MutableRefObject } from "react";
 import {
   AdditiveBlending,
   BufferGeometry,
@@ -9,6 +9,7 @@ import {
   PointsMaterial,
 } from "three";
 import type { ManifestMouseFieldValue } from "./useManifestMouseField";
+import usePerformanceMode from "../../../hooks/usePerformanceMode";
 
 function createRandomCenteredPositions(count: number, rangeX: number, rangeY: number, rangeZ: number) {
   const positions = new Float32Array(count * 3);
@@ -109,46 +110,6 @@ const MANIFEST_AMBIENT_PRECOMPUTED = {
     return { particlePositions, nodesPositions, linePositions, starsPositions };
   })(),
 } as const;
-
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setReduced(media.matches);
-
-    onChange();
-    if (typeof media.addEventListener === "function") {
-      media.addEventListener("change", onChange);
-      return () => media.removeEventListener("change", onChange);
-    }
-
-    media.addListener(onChange);
-    return () => media.removeListener(onChange);
-  }, []);
-
-  return reduced;
-}
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 767px)");
-    const onChange = () => setIsMobile(media.matches);
-
-    onChange();
-    if (typeof media.addEventListener === "function") {
-      media.addEventListener("change", onChange);
-      return () => media.removeEventListener("change", onChange);
-    }
-
-    media.addListener(onChange);
-    return () => media.removeListener(onChange);
-  }, []);
-
-  return isMobile;
-}
 
 function AmbientRig({
   isMobile,
@@ -479,15 +440,14 @@ function ManifestAmbientScene({
   mouseFieldRef: MutableRefObject<ManifestMouseFieldValue>;
   scrollPulseRef: MutableRefObject<{ value: number }>;
 }) {
-  const reducedMotion = usePrefersReducedMotion();
-  const isMobile = useIsMobile();
+  const { prefersReducedMotion: reducedMotion, isMobile, isLowPowerMode } = usePerformanceMode();
 
   return (
     <Canvas
       className="pointer-events-none absolute inset-0"
       camera={{ position: [0, 0, 5.5], fov: 50 }}
-      dpr={[1, 1.6]}
-      gl={{ antialias: true, alpha: true }}
+      dpr={[1, isLowPowerMode ? 1 : 1.35]}
+      gl={{ antialias: !isLowPowerMode, alpha: true }}
       frameloop={reducedMotion ? "demand" : "always"}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);

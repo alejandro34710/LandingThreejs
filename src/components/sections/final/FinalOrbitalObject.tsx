@@ -1,8 +1,9 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Sparkles, Environment, Float, Sphere, Trail, Stars } from "@react-three/drei";
+import { Sparkles, Environment, Float, Sphere, Stars } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import { Color, Group, MathUtils, Vector3, Mesh } from "three";
 import SceneLights from "../../three/SceneLights";
+import usePerformanceMode from "../../../hooks/usePerformanceMode";
 
 type Parallax = { x: number; y: number };
 
@@ -17,7 +18,19 @@ type InteractionRefs = {
 };
 
 // Componente para los pequeños satélites que orbitan los anillos
-function OrbitingSatellite({ radius, speed, color, offsetAngle }: { radius: number; speed: number; color: string; offsetAngle: number }) {
+function OrbitingSatellite({
+  radius,
+  speed,
+  color,
+  offsetAngle,
+  isLowPowerMode,
+}: {
+  radius: number;
+  speed: number;
+  color: string;
+  offsetAngle: number;
+  isLowPowerMode: boolean;
+}) {
   const ref = useRef<Group>(null);
   
   useFrame(({ clock }) => {
@@ -29,17 +42,21 @@ function OrbitingSatellite({ radius, speed, color, offsetAngle }: { radius: numb
 
   return (
     <group ref={ref}>
-      <Trail width={0.5} color={new Color(color)} length={4} decay={1} local={false}>
-        <mesh>
-          <sphereGeometry args={[0.04, 16, 16]} />
-          <meshBasicMaterial color={color} toneMapped={false} />
-        </mesh>
-      </Trail>
+      <mesh>
+        <sphereGeometry args={[0.04, isLowPowerMode ? 10 : 14, isLowPowerMode ? 10 : 14]} />
+        <meshBasicMaterial color={new Color(color)} toneMapped={false} />
+      </mesh>
     </group>
   );
 }
 
-function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbitalObjectProps & InteractionRefs) {
+function ClosureRig({
+  parallax,
+  reducedMotion,
+  dragRef,
+  pulseRef,
+  isLowPowerMode,
+}: FinalOrbitalObjectProps & InteractionRefs & { isLowPowerMode: boolean }) {
   const rigRef = useRef<Group | null>(null);
   const outerCoreRef = useRef<Mesh | null>(null);
   const innerCoreRef = useRef<Mesh | null>(null);
@@ -156,21 +173,33 @@ function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbital
           </mesh>
 
           <mesh ref={outerCoreRef}>
-            <sphereGeometry args={[1.05, 64, 64]} />
-            <meshPhysicalMaterial
-              color="#020617"
-              emissive={coreColor}
-              emissiveIntensity={0.2}
-              transparent
-              opacity={0.7}
-              metalness={0.9}
-              roughness={0.05}
-              clearcoat={1}
-              clearcoatRoughness={0.1}
-              ior={1.5}
-              thickness={2}
-              transmission={0.9}
-            />
+            <sphereGeometry args={[1.05, isLowPowerMode ? 28 : 64, isLowPowerMode ? 28 : 64]} />
+            {isLowPowerMode ? (
+              <meshStandardMaterial
+                color="#020617"
+                emissive={coreColor}
+                emissiveIntensity={0.16}
+                transparent
+                opacity={0.68}
+                metalness={0.45}
+                roughness={0.3}
+              />
+            ) : (
+              <meshPhysicalMaterial
+                color="#020617"
+                emissive={coreColor}
+                emissiveIntensity={0.2}
+                transparent
+                opacity={0.7}
+                metalness={0.9}
+                roughness={0.05}
+                clearcoat={1}
+                clearcoatRoughness={0.1}
+                ior={1.5}
+                thickness={2}
+                transmission={0.9}
+              />
+            )}
           </mesh>
 
           <Sphere args={[1.3, 32, 32]}>
@@ -193,7 +222,7 @@ function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbital
           rotation={[Math.PI / 3 + idx * 0.2, 0, 0]}
         >
           <mesh>
-            <torusGeometry args={[ring.r, ring.tube, 32, 100]} />
+            <torusGeometry args={[ring.r, ring.tube, isLowPowerMode ? 14 : 32, isLowPowerMode ? 44 : 100]} />
             <meshStandardMaterial
               color={ring.color}
               emissive={ring.color}
@@ -212,6 +241,7 @@ function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbital
               speed={ring.speed * 2}
               color={ring.color}
               offsetAngle={(Math.PI * 2 / ring.satellites) * satIdx}
+              isLowPowerMode={isLowPowerMode}
             />
           ))}
         </group>
@@ -225,7 +255,7 @@ function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbital
       <Stars 
         radius={15}      // Alejadas del centro
         depth={25}       // Profundidad de campo mayor
-        count={reducedMotion ? 500 : 2500} // Más cantidad para poblar el espacio
+        count={reducedMotion ? 180 : isLowPowerMode ? 300 : 2500} // Más cantidad para poblar el espacio
         factor={1.5}     // Tamaño base muy pequeño (antes estaba en 4)
         saturation={0.5} // Ligero tinte de color realista
         fade             // Que se difuminen en los bordes
@@ -234,7 +264,7 @@ function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbital
       
       {/* Polvo estelar (Sparkles) interactuando alrededor del objeto */}
       <Sparkles
-        count={reducedMotion ? 20 : 60}
+        count={reducedMotion ? 10 : isLowPowerMode ? 18 : 60}
         scale={6}        // Rango amplio
         size={0.6}       // Tamaño de la partícula mucho más fino
         speed={0.15}     // Movimiento pausado
@@ -247,11 +277,10 @@ function ClosureRig({ parallax, reducedMotion, dragRef, pulseRef }: FinalOrbital
 }
 
 function FinalOrbitalObject({ parallax, reducedMotion }: FinalOrbitalObjectProps) {
+  const { isLowPowerMode } = usePerformanceMode();
   const quality = useMemo(() => {
-    if (typeof window === "undefined") return { dpr: 1 };
-    const isMobile = window.matchMedia?.("(max-width: 1023px)")?.matches ?? false;
-    return { dpr: isMobile ? 1 : 1.25 };
-  }, []);
+    return { dpr: isLowPowerMode ? 1 : 1.25 };
+  }, [isLowPowerMode]);
 
   const isDragging = useRef(false);
   const lastPointer = useRef<{ x: number; y: number } | null>(null);
@@ -265,7 +294,7 @@ function FinalOrbitalObject({ parallax, reducedMotion }: FinalOrbitalObjectProps
       className="h-full w-full"
       camera={{ position: [0, 0, 9], fov: 35 }}
       dpr={[1, quality.dpr]}
-      gl={{ antialias: true, alpha: true, logarithmicDepthBuffer: true }}
+      gl={{ antialias: !isLowPowerMode, alpha: true, logarithmicDepthBuffer: false }}
       onPointerDown={(e) => {
         isDragging.current = true;
         lastPointer.current = { x: e.clientX, y: e.clientY };
@@ -312,7 +341,13 @@ function FinalOrbitalObject({ parallax, reducedMotion }: FinalOrbitalObjectProps
       style={{ background: "transparent", touchAction: "none" }}
     >
       <fog attach="fog" args={["#020308", 8, 20]} /> 
-      <ClosureRig parallax={parallax} reducedMotion={reducedMotion} dragRef={dragRef} pulseRef={pulseRef} />
+      <ClosureRig
+        parallax={parallax}
+        reducedMotion={reducedMotion}
+        dragRef={dragRef}
+        pulseRef={pulseRef}
+        isLowPowerMode={isLowPowerMode}
+      />
     </Canvas>
   );
 }

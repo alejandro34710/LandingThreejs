@@ -199,8 +199,24 @@ function HeroSection() {
     if (isReducedMotion) return;
     if (isStoryActive) return;
 
+    const section = sectionRef.current;
+    if (!section) return;
+
+    let isVisible = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+      },
+      { threshold: 0.05 },
+    );
+    observer.observe(section);
+
     let rafId = 0;
     const tick = () => {
+      if (!isVisible) {
+        rafId = window.requestAnimationFrame(tick);
+        return;
+      }
       const px = parallaxRef.current.x;
       const py = parallaxRef.current.y;
 
@@ -214,7 +230,10 @@ function HeroSection() {
     };
 
     rafId = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(rafId);
+    return () => {
+      observer.disconnect();
+      window.cancelAnimationFrame(rafId);
+    };
   }, [parallaxRef, isReducedMotion, isStoryActive]);
 
   return (

@@ -44,3 +44,15 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+/* Keep WebGL surfaces stable when translators/extensions inject img placeholders. */
+.r3f-surface canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+}
+
+.r3f-surface img {
+  display: none !important;
+}

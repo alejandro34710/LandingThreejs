@@ -15,6 +15,7 @@ import {
   MeshPhysicalMaterial,
 } from "three";
 import type { StoryInteractionValue } from "./useStoryInteraction";
+import usePerformanceMode from "../../../hooks/usePerformanceMode";
 
 function TwinkleSpheresBackground({
   reducedMotion,
@@ -37,7 +38,7 @@ function TwinkleSpheresBackground({
   };
 
   const spheres = useMemo(() => {
-    const count = isMobile ? 40 : 90;
+    const count = isMobile ? 24 : 90;
     const rand = mulberry32(133742069);
 
     return Array.from({ length: count }, () => {
@@ -276,7 +277,7 @@ function SceneContent({
         isMobile={isMobile}
       />
 
-      <Preload all />
+      {!isMobile ? <Preload all /> : null}
     </>
   );
 }
@@ -290,12 +291,15 @@ function StoryAbstractSculpture({
   reducedMotion: boolean;
   isMobile: boolean;
 }) {
+  const { isLowPowerMode } = usePerformanceMode();
+  const mobileMode = isMobile || isLowPowerMode;
+
   return (
     <Canvas
       className="h-full w-full"
       camera={{ position: [0, 0, 5], fov: 45 }}
-      dpr={isMobile ? [1, 1.25] : [1, 2]}
-      gl={{ antialias: !isMobile, alpha: true, powerPreference: isMobile ? "high-performance" : "default" }}
+      dpr={mobileMode ? [1, 1] : [1, 1.65]}
+      gl={{ antialias: !mobileMode, alpha: true, powerPreference: mobileMode ? "high-performance" : "default" }}
       frameloop={reducedMotion ? "demand" : "always"}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);
@@ -305,7 +309,7 @@ function StoryAbstractSculpture({
         <SceneContent
           interactionRef={interactionRef}
           reducedMotion={reducedMotion}
-          isMobile={isMobile}
+          isMobile={mobileMode}
         />
       </Suspense>
     </Canvas>

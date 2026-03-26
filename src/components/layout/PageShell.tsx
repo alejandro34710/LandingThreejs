@@ -11,7 +11,7 @@ function PageShell() {
   useSmoothScroll();
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-[#02040A] text-white">
+    <div className="notranslate min-h-screen overflow-x-clip bg-[#02040A] text-white" translate="no">
       <Navbar />
 
       <main className="pt-16 sm:pt-16">

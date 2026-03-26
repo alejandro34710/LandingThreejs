@@ -61,8 +61,25 @@ function useManifestMouseField({ containerRef, glowRef }: UseManifestMouseFieldA
     const container = containerRef.current;
     const glow = glowRef.current;
     if (!container || !glow) return;
+    const isCoarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+    if (isCoarsePointer) return;
 
     let rafId = 0;
+    let isAnimating = false;
+    let isVisible = document.visibilityState === "visible";
+
+    const startLoop = () => {
+      if (isAnimating || !isVisible) return;
+      isAnimating = true;
+      rafId = window.requestAnimationFrame(update);
+    };
+
+    const stopLoop = () => {
+      if (!isAnimating) return;
+      isAnimating = false;
+      window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    };
 
     const update = () => {
       const s = internalRef.current;
@@ -96,10 +113,26 @@ function useManifestMouseField({ containerRef, glowRef }: UseManifestMouseFieldA
         0.88 + strength * 0.18
       })`;
 
+      const hasMotion =
+        Math.abs(s.targetNormX - s.normX) > 0.002 ||
+        Math.abs(s.targetNormY - s.normY) > 0.002 ||
+        Math.abs(s.targetPx - s.px) > 0.2 ||
+        Math.abs(s.targetPy - s.py) > 0.2 ||
+        s.strength > 0.002 ||
+        s.targetStrength > 0.002;
+      if (!isVisible || !hasMotion) {
+        isAnimating = false;
+        rafId = 0;
+        return;
+      }
       rafId = window.requestAnimationFrame(update);
     };
 
-    rafId = window.requestAnimationFrame(update);
+    const onVisibilityChange = () => {
+      isVisible = document.visibilityState === "visible";
+      if (!isVisible) stopLoop();
+      else startLoop();
+    };
 
     const onPointerMove = (e: PointerEvent) => {
       // En móvil (touch) evitamos interacción costosa e invasiva.
@@ -119,6 +152,7 @@ function useManifestMouseField({ containerRef, glowRef }: UseManifestMouseFieldA
       internalRef.current.targetPx = relX;
       internalRef.current.targetPy = relY;
       internalRef.current.lastMoveAt = performance.now();
+      startLoop();
     };
 
     const onPointerEnter = (e: PointerEvent) => {
@@ -134,14 +168,17 @@ function useManifestMouseField({ containerRef, glowRef }: UseManifestMouseFieldA
       internalRef.current.targetNormY = 0;
       internalRef.current.targetPx = container.clientWidth / 2;
       internalRef.current.targetPy = container.clientHeight / 2;
+      startLoop();
     };
 
+    document.addEventListener("visibilitychange", onVisibilityChange);
     container.addEventListener("pointermove", onPointerMove);
     container.addEventListener("pointerenter", onPointerEnter);
     container.addEventListener("pointerleave", onPointerLeave);
 
     return () => {
-      window.cancelAnimationFrame(rafId);
+      stopLoop();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerenter", onPointerEnter);
       container.removeEventListener("pointerleave", onPointerLeave);
